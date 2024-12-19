@@ -29,15 +29,15 @@ function colorModeToggle() {
     return;
   }
 
-  let lightColors = {};
   let darkColors = {};
+  let lightColors = {};
   cssVariables.split(",").forEach(function (item) {
-    let lightValue = computed.getPropertyValue(`--color--${item}`);
     let darkValue = computed.getPropertyValue(`--dark--${item}`);
+    let lightValue = computed.getPropertyValue(`--color--${item}`);
     if (darkValue.length) {
       if (!lightValue.length) lightValue = darkValue;
-      darkColors[`--color--${item}`] = darkValue;
-      lightColors[`--color--${item}`] = lightValue;
+      darkColors[`--dark--${item}`] = darkValue;
+      lightColors[`--dark--${item}`] = lightValue;
     }
   });
 
@@ -69,7 +69,7 @@ function colorModeToggle() {
     } else {
       localStorage.setItem("light-mode", "false");
       htmlElement.classList.remove("light-mode");
-      setColors(lightColors, animate);
+      setColors(darkColors, animate);
       togglePressed = "false";
     }
     if (typeof toggleEl !== "undefined") {
