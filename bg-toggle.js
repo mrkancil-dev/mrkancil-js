@@ -12,7 +12,7 @@ function colorModeToggle() {
   const htmlElement = document.documentElement;
   const computed = getComputedStyle(htmlElement);
   let toggleEl;
-  let togglePressed = "true";
+  let togglePressed = "false";
 
   const scriptTag = document.querySelector("[tr-color-vars]");
   if (!scriptTag) {
@@ -24,7 +24,7 @@ function colorModeToggle() {
   let colorModeEase = attr("power1.out", scriptTag.getAttribute("ease"));
 
   const cssVariables = scriptTag.getAttribute("tr-color-vars");
-  if (!cssVariables || !cssVariables.length) {
+  if (!cssVariables.length) {
     console.warn("Value of tr-color-vars attribute not found");
     return;
   }
@@ -32,12 +32,12 @@ function colorModeToggle() {
   let lightColors = {};
   let darkColors = {};
   cssVariables.split(",").forEach(function (item) {
-    let lightValue = computed.getPropertyValue(`--color--${item}`).trim();
-    let darkValue = computed.getPropertyValue(`--dark--${item}`).trim();
-    if (lightValue) {
-      if (!darkValue) darkValue = lightValue;
-      lightColors[`--color--${item}`] = lightValue;
+    let lightValue = computed.getPropertyValue(`--color--${item}`);
+    let darkValue = computed.getPropertyValue(`--dark--${item}`);
+    if (darkValue.length) {
+      if (!lightValue.length) lightValue = darkValue;
       darkColors[`--color--${item}`] = darkValue;
+      lightColors[`--color--${item}`] = lightValue;
     }
   });
 
@@ -48,7 +48,7 @@ function colorModeToggle() {
 
   function setColors(colorObject, animate) {
     if (typeof gsap !== "undefined" && animate) {
-      gsap.to(htmlElement.style, {
+      gsap.to(htmlElement, {
         ...colorObject,
         duration: colorModeDuration,
         ease: colorModeEase,
@@ -62,17 +62,17 @@ function colorModeToggle() {
 
   function goLight(light, animate) {
     if (light) {
-      localStorage.setItem("dark-mode", "false");
-      htmlElement.classList.remove("dark-mode");
+      localStorage.setItem("light-mode", "true");
+      htmlElement.classList.add("light-mode");
+      setColors(lightColors, animate);
+      togglePressed = "true";
+    } else {
+      localStorage.setItem("light-mode", "false");
+      htmlElement.classList.remove("light-mode");
       setColors(lightColors, animate);
       togglePressed = "false";
-    } else {
-      localStorage.setItem("dark-mode", "true");
-      htmlElement.classList.add("dark-mode");
-      setColors(darkColors, animate);
-      togglePressed = "true";
     }
-    if (toggleEl) {
+    if (typeof toggleEl !== "undefined") {
       toggleEl.forEach(function (element) {
         element.setAttribute("aria-pressed", togglePressed);
       });
@@ -80,32 +80,32 @@ function colorModeToggle() {
   }
 
   function checkPreference(e) {
-    goLight(!e.matches, false);
+    goLight(e.matches, false);
   }
+  const colorPreference = window.matchMedia("(prefers-color-scheme: light)");
+  colorPreference.addEventListener("change", (e) => {
+    checkPreference(e);
+  });
 
-  const colorPreference = window.matchMedia("(prefers-color-scheme: dark)");
-  colorPreference.addEventListener("change", checkPreference);
-
-  let storagePreference = localStorage.getItem("dark-mode");
+  let storagePreference = localStorage.getItem("light-mode");
   if (storagePreference !== null) {
-    goLight(storagePreference === "false", false);
+    storagePreference === "true" ? goLight(true, false) : goLight(false, false);
   } else {
     checkPreference(colorPreference);
   }
 
-  window.addEventListener("DOMContentLoaded", () => {
+  window.addEventListener("DOMContentLoaded", (event) => {
     toggleEl = document.querySelectorAll("[tr-color-toggle]");
     toggleEl.forEach(function (element) {
-      element.setAttribute("aria-label", "Switch to Light Mode");
+      element.setAttribute("aria-label", "View Light Mode");
       element.setAttribute("role", "button");
       element.setAttribute("aria-pressed", togglePressed);
     });
-
-    document.addEventListener("click", (e) => {
+    document.addEventListener("click", function (e) {
       const targetElement = e.target.closest("[tr-color-toggle]");
       if (targetElement) {
-        const isCurrentlyLight = !htmlElement.classList.contains("dark-mode");
-        goLight(!isCurrentlyLight, true);
+        let lightClass = htmlElement.classList.contains("light-mode");
+        lightClass ? goLight(false, true) : goLight(true, true);
       }
     });
   });
