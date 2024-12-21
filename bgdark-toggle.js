@@ -33,7 +33,7 @@ function colorModeToggle() {
   let lightColors = {};
   cssVariables.split(",").forEach(function (item) {
     let darkValue = computed.getPropertyValue(`--dark--${item}`);
-    let lightValue = computed.getPropertyValue(`--bright--${item}`);
+    let lightValue = computed.getPropertyValue(`--color--${item}`);
     if (darkValue.length) {
       if (!lightValue.length) lightValue = darkValue;
       darkColors[`--dark--${item}`] = darkValue;
