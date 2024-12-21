@@ -14,18 +14,18 @@ function colorModeToggle() {
   let toggleEl;
   let togglePressed = "false";
 
-  const scriptTag = document.querySelector("[tr-color-vars]");
+  const scriptTag = document.querySelector("[list-colors]");
   if (!scriptTag) {
-    console.warn("Script tag with tr-color-vars attribute not found");
+    console.warn("Script tag with list-colors attribute not found");
     return;
   }
 
   let colorModeDuration = attr(0.5, scriptTag.getAttribute("duration"));
   let colorModeEase = attr("power1.out", scriptTag.getAttribute("ease"));
 
-  const cssVariables = scriptTag.getAttribute("tr-color-vars");
+  const cssVariables = scriptTag.getAttribute("list-colors");
   if (!cssVariables.length) {
-    console.warn("Value of tr-color-vars attribute not found");
+    console.warn("Value of list-colors attribute not found");
     return;
   }
 
@@ -33,7 +33,7 @@ function colorModeToggle() {
   let lightColors = {};
   cssVariables.split(",").forEach(function (item) {
     let darkValue = computed.getPropertyValue(`--dark--${item}`);
-    let lightValue = computed.getPropertyValue(`--color--${item}`);
+    let lightValue = computed.getPropertyValue(`--bright--${item}`);
     if (darkValue.length) {
       if (!lightValue.length) lightValue = darkValue;
       darkColors[`--dark--${item}`] = darkValue;
@@ -42,7 +42,7 @@ function colorModeToggle() {
   });
 
   if (!Object.keys(darkColors).length) {
-    console.warn("No variables found matching tr-color-vars attribute value");
+    console.warn("No variables found matching list-colors attribute value");
     return;
   }
 
@@ -95,14 +95,14 @@ function colorModeToggle() {
   }
 
   window.addEventListener("DOMContentLoaded", (event) => {
-    toggleEl = document.querySelectorAll("[tr-color-toggle]");
+    toggleEl = document.querySelectorAll("[btn-color-toggle]");
     toggleEl.forEach(function (element) {
       element.setAttribute("aria-label", "View Light Mode");
       element.setAttribute("role", "button");
       element.setAttribute("aria-pressed", togglePressed);
     });
     document.addEventListener("click", function (e) {
-      const targetElement = e.target.closest("[tr-color-toggle]");
+      const targetElement = e.target.closest("[btn-color-toggle]");
       if (targetElement) {
         let lightClass = htmlElement.classList.contains("light-mode");
         lightClass ? goLight(false, true) : goLight(true, true);
