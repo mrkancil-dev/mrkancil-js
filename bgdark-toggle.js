@@ -29,15 +29,15 @@ function colorModeToggle() {
     return;
   }
 
+  let brightColors = {};
   let darkColors = {};
-  let lightColors = {};
   cssVariables.split(",").forEach(function (item) {
+    let brightValue = computed.getPropertyValue(`--bright--${item}`);
     let darkValue = computed.getPropertyValue(`--dark--${item}`);
-    let lightValue = computed.getPropertyValue(`--bright--${item}`);
     if (darkValue.length) {
-      if (!lightValue.length) lightValue = darkValue;
+      if (!brightValue.length) brightValue = darkValue;
       darkColors[`--dark--${item}`] = darkValue;
-      lightColors[`--dark--${item}`] = lightValue;
+      brightColors[`--dark--${item}`] = brightValue;
     }
   });
 
@@ -60,15 +60,15 @@ function colorModeToggle() {
     }
   }
 
-  function goLight(light, animate) {
-    if (light) {
-      localStorage.setItem("light-mode", "true");
-      htmlElement.classList.add("light-mode");
-      setColors(lightColors, animate);
+  function goBright(bright, animate) {
+    if (bright) {
+      localStorage.setItem("bright-mode", "true");
+      htmlElement.classList.add("bright-mode");
+      setColors(brightColors, animate);
       togglePressed = "true";
     } else {
-      localStorage.setItem("light-mode", "false");
-      htmlElement.classList.remove("light-mode");
+      localStorage.setItem("bright-mode", "false");
+      htmlElement.classList.remove("bright-mode");
       setColors(darkColors, animate);
       togglePressed = "false";
     }
@@ -80,16 +80,16 @@ function colorModeToggle() {
   }
 
   function checkPreference(e) {
-    goLight(e.matches, false);
+    goBright(e.matches, false);
   }
-  const colorPreference = window.matchMedia("(prefers-color-scheme: light)");
+  const colorPreference = window.matchMedia("(prefers-color-scheme: bright)");
   colorPreference.addEventListener("change", (e) => {
     checkPreference(e);
   });
 
-  let storagePreference = localStorage.getItem("light-mode");
+  let storagePreference = localStorage.getItem("bright-mode");
   if (storagePreference !== null) {
-    storagePreference === "true" ? goLight(true, false) : goLight(false, false);
+    storagePreference === "true" ? goBright(true, false) : goBright(false, false);
   } else {
     checkPreference(colorPreference);
   }
@@ -97,15 +97,15 @@ function colorModeToggle() {
   window.addEventListener("DOMContentLoaded", (event) => {
     toggleEl = document.querySelectorAll("[btn-color-toggle]");
     toggleEl.forEach(function (element) {
-      element.setAttribute("aria-label", "View Light Mode");
+      element.setAttribute("aria-label", "View Bright Mode");
       element.setAttribute("role", "button");
       element.setAttribute("aria-pressed", togglePressed);
     });
     document.addEventListener("click", function (e) {
       const targetElement = e.target.closest("[btn-color-toggle]");
       if (targetElement) {
-        let lightClass = htmlElement.classList.contains("light-mode");
-        lightClass ? goLight(false, true) : goLight(true, true);
+        let brightClass = htmlElement.classList.contains("bright-mode");
+        brightClass ? goBright(false, true) : goBright(true, true);
       }
     });
   });
