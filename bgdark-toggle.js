@@ -95,14 +95,14 @@ function colorModeToggle() {
   }
 
   window.addEventListener("DOMContentLoaded", (event) => {
-    toggleEl = document.querySelectorAll("[tr-color-toggle]");
+    toggleEl = document.querySelectorAll("[btn-color-toggle]");
     toggleEl.forEach(function (element) {
       element.setAttribute("aria-label", "View Light Mode");
       element.setAttribute("role", "button");
       element.setAttribute("aria-pressed", togglePressed);
     });
     document.addEventListener("click", function (e) {
-      const targetElement = e.target.closest("[tr-color-toggle]");
+      const targetElement = e.target.closest("[btn-color-toggle]");
       if (targetElement) {
         let lightClass = htmlElement.classList.contains("light-mode");
         lightClass ? goLight(false, true) : goLight(true, true);
